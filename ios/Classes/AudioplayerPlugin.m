@@ -27,13 +27,7 @@ NSMutableSet *timeobservers;
 FlutterMethodChannel *_channel;
 
 +(void)initSession
-{
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector:    @selector(audioSessionInterrupted:)
-                                                 name:        AVAudioSessionInterruptionNotification
-                                               object:      [AVAudioSession sharedInstance]]; 
-
-    
+{    
     //set audio category with options
     NSError *categoryError = nil;
     [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:&categoryError];
