@@ -26,6 +26,34 @@ NSMutableSet *observers;
 NSMutableSet *timeobservers;
 FlutterMethodChannel *_channel;
 
++(void)initSession
+{
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector:    @selector(audioSessionInterrupted:)
+                                                 name:        AVAudioSessionInterruptionNotification
+                                               object:      [AVAudioSession sharedInstance]]; 
+
+    
+    //set audio category with options
+    NSError *categoryError = nil;
+    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:&categoryError];
+    
+    if (categoryError) {
+        NSLog(@"Error setting category! %@", [categoryError description]);
+    }
+    
+    //activation of audio session
+    NSError *activationError = nil;
+    BOOL success = [[AVAudioSession sharedInstance] setActive: YES error: &activationError];
+    if (!success) {
+        if (activationError) {
+            NSLog(@"Could not activate audio session. %@", [activationError localizedDescription]);
+        } else {
+            NSLog(@"audio session could not be activated!");
+        }
+    }
+}
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
                                    methodChannelWithName:CHANNEL_NAME
@@ -33,6 +61,7 @@ FlutterMethodChannel *_channel;
   AudioplayerPlugin* instance = [[AudioplayerPlugin alloc] init];
   [registrar addMethodCallDelegate:instance channel:channel];
   _channel = channel;
+  [self initSession];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
